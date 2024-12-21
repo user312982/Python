@@ -1,3 +1,3 @@
 # Djikstra
 
-![](https://github.com/user312982/Python/djikstra.gif)
+![](https://github.com/user312982/Python/shortest_path.gif)
