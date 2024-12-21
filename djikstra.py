@@ -5,13 +5,41 @@ def minimum(dict):
             min_key = i
     return min_key
 
-def dijkstra(nodes, edges, start, end):
+def print_table(iteration, nodes, distances, previous_nodes):
+    print(f"Iteration {iteration}")
+    print("+-----+" + "+-----+" * len(nodes))
+    print("|     | " + " | ".join(nodes) + " |")
+    print("+-----+" + "+-----+" * len(nodes))
+
+    for i, node in enumerate(nodes):
+        row = ["INF" if distances[n] == float('inf') else str(distances[n]) + f"/{previous_nodes[n]}" if previous_nodes[n] else str(distances[n]) for n in nodes]
+        print(f"|  {node}  | " + " | ".join(row) + " |")
+
+    print("+-----+" + "+-----+" * len(nodes))
+
+def print_path_details(nodes, distances, previous_nodes, start):
+    print("\nDetailed paths:")
+    for node in nodes:
+        if node == start:
+            continue
+        path = []
+        current = node
+        while current is not None:
+            path.insert(0, current)
+            current = previous_nodes[current]
+        print(f"- Jarak terpendek dari {start} menuju {node} adalah {distances[node]}\n  {' -> '.join(path)}")
+
+def dijkstra_with_table(nodes, edges, start, end):
     unexplored = {node: float('inf') for node in nodes}
     unexplored[start] = 0
     previous_nodes = {node: None for node in nodes}
     explored = {}
+    iteration = 0
+
+    print_table(iteration, nodes, unexplored, previous_nodes)
 
     while unexplored:
+        iteration += 1
         explore = minimum(unexplored)
         current_distance = unexplored[explore]
         del unexplored[explore]
@@ -32,14 +60,16 @@ def dijkstra(nodes, edges, start, end):
                     unexplored[from_node] = check_time
                     previous_nodes[from_node] = explore
 
+        print_table(iteration, nodes, {**unexplored, **explored}, previous_nodes)
+
     path = []
     current = end
     while current is not None:
         path.insert(0, current)
         current = previous_nodes[current]
 
-    print(f"Prev node: {previous_nodes}")
-    print(f"Shortest node from {start} to {end}: {path}")
+    print(f"Shortest path from {start} to {end}: {path}")
+    print_path_details(nodes, {**unexplored, **explored}, previous_nodes, start)
     return explored[end], path
 
 # Nodes and edges
@@ -51,5 +81,5 @@ edges = {
 }
 
 # Find the shortest path
-distance, target_path = dijkstra(nodes, edges, "1", "8")
+distance, target_path = dijkstra_with_table(nodes, edges, "1", "8")
 print(f"Shortest distance: {distance}")
