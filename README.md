@@ -4,7 +4,7 @@ This repository demonstrates Dijkstra's algorithm for finding the shortest path 
 
 ## Example Output
 
-![Graph Animation](assets/shortest_path.gif)
+![Graph Animation](shortest_path.gif)
 
 ## How to Use
 Run the script to visualize the shortest path in a given graph.
