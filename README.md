@@ -7,4 +7,4 @@ This repository demonstrates Dijkstra's algorithm for finding the shortest path 
 ![Graph Animation](shortest_path.gif)
 
 ## How to Use
-Run the script to visualize the shortest path in a given graph.
+Run the djikstraGIF.py to visualize the shortest path in a given graph.
