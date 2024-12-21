@@ -1,33 +1,42 @@
-def minimum(dict):
-    min_key = list(dict.keys())[0]
-    for i in list(dict.keys())[1:]:
-        if dict[i] < dict[min_key]:
+import time
+from copy import copy
+from prettytable import PrettyTable
+
+def minimum(dict_data):
+    min_key = list(dict_data.keys())[0]
+    for i in list(dict_data.keys())[1:]:
+        if dict_data[i] < dict_data[min_key]:
             min_key = i
     return min_key
 
-def print_table(iteration, nodes, distances, previous_nodes):
-    print(f"Iteration {iteration}")
-    print("+-----+" + "+-----+" * len(nodes))
-    print("|     | " + " | ".join(nodes) + " |")
-    print("+-----+" + "+-----+" * len(nodes))
-
-    for i, node in enumerate(nodes):
-        row = ["INF" if distances[n] == float('inf') else str(distances[n]) + f"/{previous_nodes[n]}" if previous_nodes[n] else str(distances[n]) for n in nodes]
-        print(f"|  {node}  | " + " | ".join(row) + " |")
-
-    print("+-----+" + "+-----+" * len(nodes))
-
-def print_path_details(nodes, distances, previous_nodes, start):
-    print("\nDetailed paths:")
+def generate_table(iteration, nodes, distances, previous_nodes, current_node, completed_nodes, combined_values):
+    table = PrettyTable()
+    table.title = f"Iteration {iteration}: Exploring node {current_node}"
+    table.field_names = ["Node"] + nodes  # Nodes as header
+    
+    row = ["Value"]
+    
     for node in nodes:
-        if node == start:
-            continue
-        path = []
-        current = node
-        while current is not None:
-            path.insert(0, current)
-            current = previous_nodes[current]
-        print(f"- Jarak terpendek dari {start} menuju {node} adalah {distances[node]}\n  {' -> '.join(path)}")
+        if distances[node] == float('inf'):
+            value = "INF"
+        else:
+            value = str(distances[node]) + f"/{previous_nodes[node]}" if previous_nodes[node] else str(distances[node])
+        
+        # Combine the value for the current iteration with the previous ones
+        if node in completed_nodes:
+            value = f"\033[91m{value}\033[0m"  # Red color for completed nodes
+
+        # Append the value to the combined list for this node
+        if node not in combined_values:
+            combined_values[node] = []
+        combined_values[node].append(value)
+
+        # Stack the values for each node from previous iterations
+        value_str = "\n".join(combined_values[node])
+        row.append(value_str)
+
+    table.add_row(row)
+    return table.get_string()
 
 def dijkstra_with_table(nodes, edges, start, end):
     unexplored = {node: float('inf') for node in nodes}
@@ -35,8 +44,9 @@ def dijkstra_with_table(nodes, edges, start, end):
     previous_nodes = {node: None for node in nodes}
     explored = {}
     iteration = 0
-
-    print_table(iteration, nodes, unexplored, previous_nodes)
+    combined_tables = []
+    completed_nodes = set()
+    combined_values = {}
 
     while unexplored:
         iteration += 1
@@ -44,6 +54,17 @@ def dijkstra_with_table(nodes, edges, start, end):
         current_distance = unexplored[explore]
         del unexplored[explore]
         explored[explore] = current_distance
+        completed_nodes.add(explore)
+
+        # Generate the table for the current iteration
+        table = generate_table(iteration, nodes, {**unexplored, **explored}, previous_nodes, explore, completed_nodes, combined_values)
+
+        # Print the table for this iteration
+        print(f"\n=== Iteration {iteration} ===")
+        print(table)
+
+        # Pause to simulate processing
+        time.sleep(1)
 
         if explore == end:
             break
@@ -60,7 +81,10 @@ def dijkstra_with_table(nodes, edges, start, end):
                     unexplored[from_node] = check_time
                     previous_nodes[from_node] = explore
 
-        print_table(iteration, nodes, {**unexplored, **explored}, previous_nodes)
+    # Final results
+    print("\n=== Final Combined Table ===")
+    for table in combined_tables:
+        print(table)
 
     path = []
     current = end
@@ -68,8 +92,7 @@ def dijkstra_with_table(nodes, edges, start, end):
         path.insert(0, current)
         current = previous_nodes[current]
 
-    print(f"Shortest path from {start} to {end}: {path}")
-    print_path_details(nodes, {**unexplored, **explored}, previous_nodes, start)
+    print(f"\nShortest path from {start} to {end}: {path}")
     return explored[end], path
 
 # Nodes and edges
@@ -82,4 +105,4 @@ edges = {
 
 # Find the shortest path
 distance, target_path = dijkstra_with_table(nodes, edges, "1", "8")
-print(f"Shortest distance: {distance}")
+print(f"\nShortest distance: {distance}")
