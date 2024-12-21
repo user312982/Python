@@ -1,3 +1,10 @@
-# Djikstra
+# Dijkstra's Algorithm Visualization
 
-![](https://github.com/user312982/Python/shortest_path.gif)
+This repository demonstrates Dijkstra's algorithm for finding the shortest path in a weighted graph.
+
+## Example Output
+
+![Graph Animation](assets/shortest_path.gif)
+
+## How to Use
+Run the script to visualize the shortest path in a given graph.
